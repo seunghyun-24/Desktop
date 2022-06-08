@@ -145,6 +145,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
 /* Allocates dynamic memory for a trie node and returns its address to caller
 	return	node pointer
 			NULL if overflow
@@ -155,16 +156,19 @@ TRIE *trieCreateNode(void){
 
 	trie->index = -1;
 	//trie->subtrees
-	else return trie;
+	return trie;
 };
 
 /* Deletes all data in trie and recycles memory
 */
 void trieDestroy( TRIE *root){
 	
-	//while(root->subtrees){
-	//	trieDestroy(root->subtrees);
-	//}
+	while(root->index != -1){
+		free(root);
+		for(int i=0; i<26; i++){
+			free(root->subtrees[i]);
+		}
+	}
 
 	free(root);
 };
@@ -225,22 +229,24 @@ int trieSearch( TRIE *root, char *str){
  
        	node = node->subtrees[index];
     }
- 
+
     return (node->index);
 };
 
 /* prints all entries in trie using preorder traversal
 */
 void trieList( TRIE *root, char *dic[]){
-
-	while(!root){
-
+	printf("!");
+	int j=0;
+	while(j < 8){
 		if(root->index != -1) printf("%s\t", dic[root->index]);
+		
 		for(int i=0; i<26; i++){
+			j++;
 			if(root->subtrees[i]) trieList(root->subtrees[i], dic);
 		}
-
 	}
+
 };
 
 /* prints all entries starting with str (as prefix) in trie
@@ -248,6 +254,25 @@ void trieList( TRIE *root, char *dic[]){
 	this function uses trieList function
 */
 void triePrefixList( TRIE *root, char *str, char *dic[]){
+
+	int level = 0;
+    int length = strlen(str);
+    int index;
+
+    TRIE *node = root;
+ 
+    for (level = 0; level < length; level++)
+    {
+        index = getIndex(str[level]);
+		printf("%d", node->index);
+		printf("%d",)
+       	node = node->subtrees[index];
+    }
+
+	
+	printf("^%d", node->subtrees[0]->index);
+
+	trieList(node, dic);
 
 };
 
@@ -297,5 +322,10 @@ void clear_permuterms( char *permuterms[], int size){
 	this function uses triePrefixList function
 */
 void trieSearchWildcard( TRIE *root, char *str, char *dic[]){
+	
+	char *newstr;
+	char *s;
+	
+	for(newstr=str; s=strtok(newstr,"*"); newstr=NULL) triePrefixList(root, newstr, dic);
 
 };
