@@ -107,8 +107,9 @@ int main(int argc, char **argv)
 		{
 			num_p = make_permuterms( str, permuterms);
 			
-			for (int i = 0; i < num_p; i++)
+			for (int i = 0; i < num_p; i++){
 				trieInsert( permute_trie, permuterms[i], index);
+			}
 			
 			clear_permuterms( permuterms, num_p);
 			
@@ -155,7 +156,6 @@ TRIE *trieCreateNode(void){
 	if(trie == NULL) return NULL;
 
 	trie->index = -1;
-	//trie->subtrees
 	return trie;
 };
 
@@ -193,7 +193,12 @@ int trieInsert( TRIE *root, char *str, int dic_index){
 		if(isupper(str[level])) str[level] = tolower(str[level]);
 
 		index = getIndex(str[level]);
-		if(index<0 || index>=26) return 0;
+
+		if(index<0 || index>=26 ) { 
+			if(str[level] != EOW) return 0;
+			else break;
+		}
+
 		
 		if(!node->subtrees[index]) {
 			node->subtrees[index] = trieCreateNode();
@@ -226,7 +231,7 @@ int trieSearch( TRIE *root, char *str){
         index = getIndex(str[level]);
  
         if (!node->subtrees[index]) return -1;
- 
+
        	node = node->subtrees[index];
     }
 
@@ -236,14 +241,11 @@ int trieSearch( TRIE *root, char *str){
 /* prints all entries in trie using preorder traversal
 */
 void trieList( TRIE *root, char *dic[]){
-	printf("!");
-	int j=0;
-	while(j < 8){
-		if(root->index != -1) printf("%s\t", dic[root->index]);
-		
+	
+	if(root){
+		if(root->index != -1) printf("%s\n", dic[root->index]);
 		for(int i=0; i<26; i++){
-			j++;
-			if(root->subtrees[i]) trieList(root->subtrees[i], dic);
+			if(root->subtrees[i]) { trieList(root->subtrees[i], dic);}
 		}
 	}
 
@@ -264,13 +266,11 @@ void triePrefixList( TRIE *root, char *str, char *dic[]){
     for (level = 0; level < length; level++)
     {
         index = getIndex(str[level]);
-		printf("%d", node->index);
-		printf("%d",)
-       	node = node->subtrees[index];
-    }
 
-	
-	printf("^%d", node->subtrees[0]->index);
+		if (!node->subtrees[index]) return;
+
+       	node = (node->subtrees[index]);
+    }
 
 	trieList(node, dic);
 
@@ -293,6 +293,7 @@ int make_permuterms( char *str, char *permuterms[]){
 	for(int j=0; j<= len; j++){
 
 		permuterms[j] = strdup(new);
+		
 
 		char save = new[0];
 
@@ -326,6 +327,8 @@ void trieSearchWildcard( TRIE *root, char *str, char *dic[]){
 	char *newstr;
 	char *s;
 	
-	for(newstr=str; s=strtok(newstr,"*"); newstr=NULL) triePrefixList(root, newstr, dic);
+	newstr=str; 
+	s=strtok(newstr,"*");
+	triePrefixList(root, s, dic);
 
 };
